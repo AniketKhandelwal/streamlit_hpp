@@ -1,18 +1,35 @@
 import streamlit as st
 import pandas as pd
 from predict_pipeline import predict_price
-from preprocessing import input_features
+from feature_description import feature_info
 
+st.set_page_config(page_title="House Price Predictor", layout="centered")
 st.title("🏠 House Price Prediction App")
-st.markdown("Enter the house details below:")
+
+st.markdown("Enter the property features below to predict the price:")
+
+user_input = {}
+
+for feature, meta in feature_info.items():
+    label = f"{feature}"
+    help_text = meta.get("description", "")
+    categories = meta.get("categories", None)
+
+    if categories:
+        options = list(categories.keys())
+        option_labels = [f"{key} - {val}" for key, val in categories.items()]
+        selection = st.selectbox(label, option_labels, help=help_text)
+        selected_key = selection.split(" - ")[0]  
+        try:
+            user_input[feature] = int(selected_key)
+        except ValueError:
+            user_input[feature] = selected_key
+    else:
+        user_input[feature] = st.number_input(label, value=0.0, help=help_text)
 
 
-user_data = {}
-for feature in input_features:
-    user_data[feature] = st.number_input(label=feature, value=0.0)
-
+input_df = pd.DataFrame([user_input])
 
 if st.button("Predict Price"):
-    input_df = pd.DataFrame([user_data])
     price = predict_price(input_df)
-    st.success(f"🏷️ Estimated House Price: ₹ {price:,.0f}")
+    st.success(f"Estimated Sale Price: $ {int(price):,}")
