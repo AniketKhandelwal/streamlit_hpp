@@ -41,7 +41,7 @@ st.subheader("📊 Lot Area vs Sale Price")
 
 
  
-df = pd.read_csv("./dataset/train.csv") 
+df = pd.read_csv("project/dataset/train.csv") 
 
 if 'LotArea' in df.columns and 'SalePrice' in df.columns:
     fig = px.scatter(
